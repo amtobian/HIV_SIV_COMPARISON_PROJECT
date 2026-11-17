@@ -104,6 +104,8 @@ The plotting step writes `results/region_pairwise_identity_heatmap.svg`, with on
 
 <img src="./results/region_pairwise_identity_heatmap.svg" alt="Pairwise nucelotide identity by gene and viral group" width="1000">
 
+This map shows pairwise identity for the ENV, GAG, and POL regions of the genome. The direct comparisons (e.g. SIV to SIV, HIV to HIV, HIV1 to HIV1...) are group averages not comparisions of each sequence to itself. The summarizer compares every distinct pair of sequences and pools the matching and callable nucleotide sites; gaps and ambiguous bases are excluded. Since sequences vary, those averages are below 100%.
+
 ### 7. Create sliding-window diversity and conservation profiles
 
 This step uses the existing MAFFT alignments from step 5. It does not rerun sequence extraction or alignment. After the alignments are available, run the analysis and plotting scripts from the project directory submitted as a Slurm job:
@@ -118,6 +120,21 @@ the terminal columns are included; alignments shorter than 100 columns use one w
 `08_sliding_window_profiles.py` writes `results/sliding_window_profiles.csv`. It reports each observed dataset group separately, plus an `ALL` profile pooled across groups, for env, pol, and gag. Nucleotide diversity (π per site) is the mean per-column fraction of callable sequence pairs that differ. Mean conservation is the average frequency of the most common unambiguous nucleotide at callable columns, and invariant-site percentage is the percentage of columns with at least two callable sequences that agree completely. Gaps and ambiguous bases are excluded. The CSV records the window's alignment-column coordinates and the number of columns usable for each metric; a metric is blank when no sites can be evaluated.
 
 `09_plot_sliding_window_profiles.py` creates six SVGs in `results/`: one nucleotide-diversity and one conservation profile for each of env, pol, and gag. The horizontal axis is alignment-column position, not genomic coordinates. The scripts use Python's standard library and require no additional package.
+
+The six profiles are arranged below in a 2-row by 3-column gallery: columns are env, pol, and gag; the first row shows conservation and the second row shows nucleotide diversity.
+
+<table>
+  <tr>
+    <td align="center"><strong>ENV conservation</strong><br><img src="./results/env_sliding_window_conservation.svg" alt="ENV sliding-window conservation profile" width="100%"></td>
+    <td align="center"><strong>POL conservation</strong><br><img src="./results/pol_sliding_window_conservation.svg" alt="POL sliding-window conservation profile" width="100%"></td>
+    <td align="center"><strong>GAG conservation</strong><br><img src="./results/gag_sliding_window_conservation.svg" alt="GAG sliding-window conservation profile" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>ENV nucleotide diversity</strong><br><img src="./results/env_sliding_window_nucleotide_diversity.svg" alt="ENV sliding-window nucleotide diversity profile" width="100%"></td>
+    <td align="center"><strong>POL nucleotide diversity</strong><br><img src="./results/pol_sliding_window_nucleotide_diversity.svg" alt="POL sliding-window nucleotide diversity profile" width="100%"></td>
+    <td align="center"><strong>GAG nucleotide diversity</strong><br><img src="./results/gag_sliding_window_nucleotide_diversity.svg" alt="GAG sliding-window nucleotide diversity profile" width="100%"></td>
+  </tr>
+</table>
 
 ## Personal Reflection 
 What started as a whim during the add/drop period at the beginning of the semester has somehow turned into this project! Before this class I didn't even really know what a HPC was, how to fully use my terminal to contorl my computer, wildcards in bash scripts and anything about Git/Github. I had taken Intro to Programming and Data Structures but the hpc seemed very far away. This class and this project has really pushed my limits on how I am using a computer, and even AI tools. If you told me 3 years ago when I entered college that I would be using a 'high performance computer' or even the amount of coding that I am doing I dont think I would have believed you. 
