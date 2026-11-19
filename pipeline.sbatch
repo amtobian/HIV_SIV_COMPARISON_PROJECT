@@ -25,6 +25,9 @@ bash scripts/05_compare.sh
 # Pairwise Comparisons 
 bash scripts/07_pairwise_identity.sh 
 
+# Sliding Window Profiles 
+bash scripts/08_sliding_window_profiles.sbatch 
+
 
 # Complete 
 echo "Pipeline Complete!" 

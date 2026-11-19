@@ -1,6 +1,6 @@
 # HIV/SIV conservation comparison
 
-This project collects HIV and simian immunodeficiency virus (SIV) genome sequences to investigate how they are conserved. Downloaded data is stored in Scratch 10 on an HPC. This project was completed for the class Supercomputing for Science class at William & Mary. 
+This project collects HIV (Human Immunodeficiency Virus) and Simian Immunodeficiency Virus (SIV) genome sequences to investigate how they are conserved. Downloaded data is stored in Scratch 10 on an HPC. This project was completed for the Supercomputing for Science class at William & Mary. 
 
 ### How does nucleotide sequence diversity differ among the gag, pol, and env genes across HIV-1, HIV-2, and SIV, and which genomic regions exhibit the greatest evolutionary conservation?
 
@@ -108,8 +108,7 @@ This map shows pairwise identity for the ENV, GAG, and POL regions of the genome
 
 ### 7. Create sliding-window diversity and conservation profiles
 
-This step uses the existing MAFFT alignments from step 5. It does not rerun sequence extraction or alignment. After the alignments are available, run the analysis and plotting scripts from the project directory submitted as a Slurm job:
-
+This step uses the existing MAFFT alignments from step 5 to create the profiles.
 ```bash
 sbatch scripts/08_sliding_window_profiles.sbatch
 ```
@@ -136,9 +135,41 @@ The six profiles are arranged below in a 2-row by 3-column gallery: columns are 
   </tr>
 </table>
 
+### 8. Statistical comparisons of diversity among genes and viral groups
+
+After the aligned FASTA files from step 5 are available, submit the statistical analysis as a Slurm job from the project directory:
+
+```bash
+sbatch scripts/10_statistical_diversity.sbatch
+```
+
+The script compares mean nucleotide diversity (π per site) between every pair of observed viral groups within each gene, and between every pair of genes within each viral group. It writes estimates, differences (`A - B`), 95% block-bootstrap confidence intervals, two-sided bootstrap p-values, and Holm-adjusted p-values across all comparisons to `results/statistical_diversity_comparisons.csv`. The pooled `ALL` profile is not included as a viral group.
+
+The analysis resamples contiguous blocks of approximately 100 alignment columns with replacement (10,000 replicates by default; random seed 314159). Comparisons between groups within one gene use the same resampled blocks; comparisons between genes use independent block resamples. P-values use a null-centered bootstrap distribution, and Holm adjustment controls the family-wise error rate across the reported comparisons. Gaps and ambiguous bases are excluded from per-site diversity, matching the sliding-window calculation. Groups with fewer than two sequences or fewer than two callable blocks are skipped and reported in the job output.
+
+These intervals and tests measure variation across alignment blocks **conditional on the sequences included in each alignment**; they do not resample the viral sequences and therefore do not quantify uncertainty from sequence sampling. The number of sequences and callable columns for each comparison is included in the CSV. This workflow uses the existing Conda environment and Python standard library.
+
+After the statistical job finishes, create a forest plot from its CSV:
+
+```bash
+python scripts/11_plot_statistical_diversity.py
+```
+
+The plotter reads `results/statistical_diversity_comparisons.csv` and writes `results/statistical_diversity_forest_plot.svg`. It shows each estimated diversity difference and its 95% block-bootstrap confidence interval; red points indicate Holm-adjusted p-values below 0.05. It does not rerun the analysis or modify the CSV. To use different paths, pass `--input` and/or `--output`.
+
+<img src="./results/statistical_diversity_forest_plot.svg" alt="Forest plot of statistical diversity comparisons with 95% confidence intervals" width="100%">
+
+Each point shows the estimated difference in mean nucleotide diversity (π per site), calculated as **A − B**; the horizontal line is its 95% block-bootstrap confidence interval. Values to the right of zero indicate higher estimated diversity for A, while values to the left indicate higher estimated diversity for B. An interval crossing zero includes no difference among its plausible values.
+
+The upper section compares viral groups within each gene; the lower section compares genes within each viral group. Red points have a Holm-adjusted p-value below 0.05, while blue points do not. The color uses the adjusted p-value, not whether the confidence interval crosses zero, so those two visual cues can differ. For example, the ENV HIV-vs-HIV1 estimate is about −0.101 π/site, indicating lower estimated diversity in HIV than HIV1; it is red because its adjusted p-value is about 0.0045.
+
+Interpret results in the context of the included sequences. The bootstrap resamples alignment blocks, not sequences, so the intervals describe uncertainty across blocks conditional on these alignments and do not capture uncertainty from which viral sequences were sampled. Sample counts are in the CSV's `n_sequences_a` and `n_sequences_b` columns; some groups have small counts, so consult them alongside the plot.
+
 ## Personal Reflection 
 What started as a whim during the add/drop period at the beginning of the semester has somehow turned into this project! Before this class I didn't even really know what a HPC was, how to fully use my terminal to contorl my computer, wildcards in bash scripts and anything about Git/Github. I had taken Intro to Programming and Data Structures but the hpc seemed very far away. This class and this project has really pushed my limits on how I am using a computer, and even AI tools. If you told me 3 years ago when I entered college that I would be using a 'high performance computer' or even the amount of coding that I am doing I dont think I would have believed you. 
 
 This project started with an idea of comparing HIV and SIV as I worked in a HIV lab this summer looking at how HIV antibodies show up on immunoassays -  how these immunoassays might potentially be used instead of viral load testing as viral load testing is expensive and processing blood sammples for periperal blood mononuclear cells (PBMCs) and plasma. It ended up morphing more into a genomics project with data from NCBI but thats kinda where the initial HIV idea came from. 
 
-I learned a lot as I was completing this project. This class was the first time I had heard of conda (not the snake!) let alone use conda to control what tool versions I am using. I learned to use GitHub to store my work (this project is it's own repository!) in a place where others can see/access the project that I am working on. (You might be looking at this on Github!) I spent a lot of time figuring out what I was doing for this project, and that is evident in the github pushes, the prompt action log and this README document. 
+I learned a lot as I was completing this project. This class was the first time I had heard of conda (not the snake!) let alone use conda to control what tool versions I am using. I learned to use GitHub to store my work (this project is it's own repository!) in a place where others can see/access the project that I am working on. (You are probably looking at this on Github!) I spent a lot of time figuring out what I was doing for this project, and that is evident in the github pushes, the prompt action log and this README document. 
+
+There were also struggles in this project that are evident purely in the repository. I had reached my space limit on sciclone so I was not able to log in via VS Code to work on this project at one point. I had to troubleshoot what was taking so long and ultimately get rid of 30 GB of temporary git files that were sitting on my home directory from in class when I was attempting to push large directories and it failing. (I've definitely learned my lesson here!)

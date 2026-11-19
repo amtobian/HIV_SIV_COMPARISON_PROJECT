@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/sciclone/home/amtobian/HIV_SIV_COMPARISON_PROJECT/scripts/10_statistical_diversity.py", line 392, in <module>
+    main()
+    ~~~~^^
+  File "/sciclone/home/amtobian/HIV_SIV_COMPARISON_PROJECT/scripts/10_statistical_diversity.py", line 378, in main
+    comparisons, skipped = analyze(
+                           ~~~~~~~^
+        args.results_dir,
+        ^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        args.seed,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/sciclone/home/amtobian/HIV_SIV_COMPARISON_PROJECT/scripts/10_statistical_diversity.py", line 217, in analyze
+    raise FileNotFoundError(f"Required alignment not found: {alignment_path}")
+FileNotFoundError: Required alignment not found: /sciclone/home/amtobian/HIV_SIV_COMPARISON_PROJECT/results/env.aln.fasta
